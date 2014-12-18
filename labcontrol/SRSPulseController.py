@@ -26,22 +26,10 @@ class SRSPulseSimulator:
         self.lastCommand = None
         print "The SRSPulsesim is made" 
 
-    def preparePulse(self, channel_conf, mode):
-        logger.debug('Pulse prepared, relative delay is set to' + str(channel_conf["RD"]))
-
-    def startOutput(self, srsPulseSettings):
-        logger.debug('Timeframe settings initialized and set to the following: relative delay is ' + str(srsPulseSettings["RelativeDelay"]) \
-        + ', pulse length is ' + str(srsPulseSettings["PulseLength"]))
-
-    def sendPulse(self):
-        logger.debug("Pulse sent")
-
     def write(self, string):
         '''visa command write function'''
         self.lastCommand = string
-        
-    def preparePulse(self, pulse_length):
-        logger.debug('Pulse prepared, length set at' + str(pulse_length))
+
 
 class SRSPulseController:
     '''interface to Stanfor Research System Four Channel Digital Pulse Generator Model DG535'''
@@ -53,9 +41,7 @@ class SRSPulseController:
         try:
             import visa #pylint: disable=F0401
             # try-clause
-
             self.__pulse = visa.instrument('TCPIP0::10.0.0.3::gpib0,15::INSTR', timeout = 1)
-            logger.warn("SRS pulse generator loaded")
         except:
             logger.warn("can't load visa driver for SRS Pulse generator, using simulator")
             self.__pulse = SRSPulseSimulator()
@@ -138,10 +124,6 @@ class SRSPulseController:
 
     def sendPulse(self):
         self.__pulse.write("SS")
-        print "Pulse sent"
-
-
-
 
 
 

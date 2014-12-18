@@ -16,9 +16,13 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 ### END LICENSE
 
-''' Controller for Agilent 33250A Function Generator, via VISA. could also control other visa devices'''
+''' Controller for Rhode Schwarz microwave source, via VISA. could also control other visa devices'''
 
 import logging
+import numpy as np
+import math
+import os
+import sys
 
 class RohSchSimulator:
     '''simulator, if visa is not present'''
@@ -33,18 +37,9 @@ class RohSchSimulator:
         '''visa command write function'''
         self.lastCommand = string
 
-    def startOutput(self,data):
-        logger.debug('Timeframe settings initialized: frequency is ' + str(data['Freq']) + ', amplitude is ' + str(data['Pow']))
-
-    def setFrequency(self,frequency):
-        logger.debug('RohSch simulator at %s Hz ' %(frequency))
-
-    def setAmplitude(self,amplitude):
-        logger.debug('RohSch simulator at %s V Amplitude ' %(amplitude))
-
 
 class RohSchController:
-    '''interface to Tektronix oscilloscopes'''
+    '''interface to Rhode&Schwarz microwave source'''
     def __init__(self,logID):
         if logID == 'labalyzer':
             logger=logging.getLogger('labalyzer')
@@ -53,8 +48,8 @@ class RohSchController:
         try:
             import visa #pylint: disable=F0401
             # try-clause
-            rm = visa.ResourceManager("C:/Windows/System32/visa32.dll")
-            self.__rohsch = rm.get_instrument('TCPIP0::169.254.58.10::gpib0,28::INSTR', timeout = 1)
+            
+            self.__rohsch = visa.instrument('TCPIP0::10.0.0.3::gpib0,28::INSTR', timeout = 1)
             logger.warn("RohSch function generator loaded")
         except:
             logger.warn("can't load visa driver for RohSch function generator, using simulator")
@@ -66,16 +61,39 @@ class RohSchController:
         pass
 
     def startOutput(self,data):
+        freq = data["Freq"] #in Hz
+        output = data["Output"]
+        power = 0
+        
         self.__rohsch.write('*RST;*CLS')
-        self.__rohsch.write('FREQ ' + str(data['Freq']) + 'MHz')
-        self.__rohsch.write('POW ' + str(data['Pow'] + 'dBm')
         self.__rohsch.write('OUTP:STAT ON')
         self.__rohsch.write('AM:SOUR INT')
-        pass
+        localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+        file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.0mW.csv")
 
+        table = np.loadtxt(file_name, delimiter=',', skiprows=1)
+        count = 0
+        
+        for point in table:
+            point_freq = point[0] * 10**6
+            if point_freq >= freq:
+                #linear interpolation
+                y1 = table[count][1]
+                y2 = point[1]
+                x1 = table[count][0]
+                x2 = point[0]
+
+                power = y1 + ((y2-y1)/(x2-x1)) * (freq - x1)
+            count += 1
+
+        self.setFrequency(freq)
+        self.setPower(power)
 
     def setFrequency(self, frequency):
         self.__rohsch.write('FREQ ' + str(frequency))
+
+    def setPower(self, power):
+        self.__rohsch.write('POW ' + str(power) + 'dBm')
 
     def setAmplitude(self, amplitude):
         self.__rohsch.write('VOLT ' + str(amplitude))
@@ -84,13 +102,11 @@ class RohSchController:
         self.__rohsch.write('VOLT:OFFS ' + str(offset))
 
     def setSine(self, frequency, amplitude, offset):
-        self.__rohsch.write('APPL:SIN ' + str(frequency*1e6) + ',' + str(amplitude) + ',' + str(offset))
+        self.__rohsch.write('APPL:SIN ' + str(frequency * 1e6) + ','
+         + str(amplitude) + ',' + str(offset))
 
     def setDC(self, voltage):
         self.__rohsch.write('APPL:DC DEF,DEF,' + str(voltage))
-
-
-
 
 
     def toggleOutput(self, outputOn):

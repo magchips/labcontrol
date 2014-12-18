@@ -39,34 +39,6 @@ class AgilentSimulator:
     def write(self, string):
         '''visa command write function'''
         self.lastCommand = string
-    def setFrequency(self,frequency):
-        logger.debug('Agilent simulator at %s Hz ' %(frequency))
-
-    def setAmplitude(self,amplitude):
-        logger.debug('Agilent simulator at %s V Amplitude ' %(amplitude))
-
-    def setBurstMode(self):
-        logger.debug('Agilent simulator is set to triggered burst mode.')
-
-    def setOffset(self, offset):
-        logger.debug('Offset is set to ' + str(offset))
-
-    def setSine(self, frequency, amplitude, offset):
-        logger.debug('Sine mode was initialized with frequency ' + str(frequency) + ", amplitude " + str(amplitude) + " and offset " + str(offset) + ".")
-
-    def setDC(self, voltage):
-        logger.debug('Voltage is set to ' + str(voltage))
-
-    def setPulse(self, pulse_length):
-        logger.debug('Pulse was manually set. Pulse length is' + str(pulse_length))
-
-    def setBurstMode(self, mode):
-        logger.debug('Burst mode initialized.')
-        if mode == "Ext":
-            logger.debug('trigger was set to external')
-        else:
-            logger.debug('trigger was set to single shot')
-
 
 class AgilentController2:
     '''interface to Tektronix oscilloscopes'''
@@ -78,8 +50,7 @@ class AgilentController2:
         try:
             import visa #pylint: disable=F0401
             # try-clause
-
-            self.__agilent = visa.instrument('TCPIP0::10.0.0.3::gpib0,9::INSTR', timeout = 1)
+            self.__agilent = visa.instrument('TCPIP0::169.254.58.10::gpib0,10::INSTR', timeout = 1)
             logger.warn("Agilent 2 function generator loaded")
         except:
             logger.warn("can't load visa driver for Agilent function generator, using simulator")
