@@ -42,6 +42,7 @@ class SRSPulseController:
             import visa #pylint: disable=F0401
             # try-clause
             self.__pulse = visa.instrument('TCPIP0::10.0.0.3::gpib0,15::INSTR', timeout = 1)
+            logger.warn("SRS pulse generator loaded")
         except:
             logger.warn("can't load visa driver for SRS Pulse generator, using simulator")
             self.__pulse = SRSPulseSimulator()
@@ -60,32 +61,44 @@ class SRSPulseController:
         self.__pulse.write("TZ 0,0")  # set Trigger input impendance to 50 Ohm
         self.__pulse.write("TZ 4,0")  # set AB output impendance to 50 Ohm
         self.__pulse.write("TZ 7,1")  # set CD output impendance to High
+
+        RD = srsPulseSettings["RelativeDelay"] + constants.DELAY_REDBLUE
         if srsPulseSettings["PulseLength"] == 0:
-            if srsPulseSettings["RelativeDelay"] <= 0:
+            if RD < 0:
                 self.__pulse.write("DT 5,1,0")
                 self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
-                self.__pulse.write("DT 2,1," + str(srsPulseSettings["RelativeDelay"] * -1.0) + "E-9")
+                self.__pulse.write("DT 2,1," + str(RD * -1.0) + "E-9")
+                print "!!!!DT 2,1," + str(RD * -1.0) + "E-9"
                 self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
 
-            elif srsPulseSettings["RelativeDelay"] > 0:
+            elif RD == 0:
+                self.__pulse.write("DT 5,1,0")
+                self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
+                self.__pulse.write("DT 2,1," + str(RD) + "E-9")
+
+                print "!!DT 2,1," + str(RD) + "E-9"
+                self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
+
+            elif RD > 0:
                 print "RD is larger than 0"
                 self.__pulse.write("DT 2,1,0")
                 self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
-                self.__pulse.write("DT 5,1," + str(srsPulseSettings["RelativeDelay"]) + "E-9")
+                self.__pulse.write("DT 5,1," + str(RD) + "E-9")
+                print "!DT 5,1," + str(RD) + "E-9"
                 self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
 
         else:
             if srsPulseSettings["RelativeDelay"] <= 0:
                 self.__pulse.write("DT 5,1,0")
                 self.__pulse.write("DT 6,5," + str(srsPulseSettings["PulseLength"]) + "E-9")
-                self.__pulse.write("DT 2,1," + str(srsPulseSettings["RelativeDelay"] * -1.0) + "E-9")
+                self.__pulse.write("DT 2,1," + str(srsPulseSettings["RelativeDelay"] * -1.0 + constants.DELAY_REDBLUE) + "E-9")
                 self.__pulse.write("DT 3,2," + str(srsPulseSettings["PulseLength"]) + "E-9")
 
             elif srsPulseSettings["RelativeDelay"] > 0:
                 print "RD is larger than 0"
                 self.__pulse.write("DT 2,1,0")
                 self.__pulse.write("DT 3,2," + str(srsPulseSettings["PulseLength"]) + "E-9")
-                self.__pulse.write("DT 5,1," + str(srsPulseSettings["RelativeDelay"]) + "E-9")
+                self.__pulse.write("DT 5,1," + str(srsPulseSettings["RelativeDelay"] + constants.DELAY_REDBLUE) + "E-9")
                 self.__pulse.write("DT 6,5," + str(srsPulseSettings["PulseLength"]) + "E-9")
 
 

@@ -73,17 +73,25 @@ class RohSchController:
 
         table = np.loadtxt(file_name, delimiter=',', skiprows=1)
         count = 0
+        point_found = False
         
         for point in table:
             point_freq = point[0] * 10**6
-            if point_freq >= freq:
+            if point_freq > freq and not point_found:
                 #linear interpolation
-                y1 = table[count][1]
+                y1 = table[count - 1][1]
                 y2 = point[1]
-                x1 = table[count][0]
+                x1 = table[count - 1][0]
                 x2 = point[0]
 
-                power = y1 + ((y2-y1)/(x2-x1)) * (freq - x1)
+                point_found = True
+
+                power = y1 + ((y2-y1)/(x2-x1)) * (freq * 10**(-6) - x1)
+                
+            elif point_freq == freq:
+                power = point[1]
+                point_found = True
+                
             count += 1
 
         self.setFrequency(freq)

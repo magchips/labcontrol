@@ -79,6 +79,7 @@ class NIDAQOutputSimulator:
 	def DAQmxSetAODataXferMech(handle, PhysicalChannel, value): pass
 
 
+
 class NIDAQOutputController:
 	'''interface to DAQmx controlled NI analog output cards'''
 	def __init__(self):

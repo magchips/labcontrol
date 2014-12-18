@@ -17,7 +17,7 @@
 '''interface to NIDAQmx analog input cards'''
 
 import ctypes
-import time # for blocking delay in simulator
+
 
 import logging
 logger = logging.getLogger('starkalyzer')
@@ -78,8 +78,7 @@ class NIDAQInputSimulator:
 	@staticmethod
 	def DAQmxCreateAIVoltageChan(taskHandle, physicalChannel, nameToAssignToChannel, terminalConfig, minVal, maxVal, units, customScaleName): pass
 	@staticmethod
-	def DAQmxReadAnalogF64(handle, noSamples, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved):
-		time.sleep(1)
+	def DAQmxReadAnalogF64(handle, noSamples, timeout, fillMode, readArray, arraySizeInSamps, sampsPerChanRead, reserved): pass
 	@staticmethod
 	def DAQmxSetStartTrigType(taskHandle, data): pass
 	@staticmethod
@@ -151,6 +150,7 @@ class NIDAQInputController:
 		buff = buffType(*[0]*tmp)
 
 		self.__nidaq.DAQmxReadAnalogF64(self.__taskHandle, int32(self.noSamples), float64(200), DAQmx_Val_GroupByChannel, ctypes.byref(buff), uInt32(tmp), ctypes.byref(sRead), None)
+		
 		print sRead.value, "samples read"
 		return buff	
 	

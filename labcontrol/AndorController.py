@@ -68,7 +68,6 @@ class AndorSimulator:
 	def SetNumberKinetics(self, number): pass
 	def SetExposureTime(self, exposureTime): pass
 	def StartAcquisition(self): pass
-	def GetNumberADChannels(self, channels): pass
 	def Shutdown(self): pass
 
 class AndorController:

@@ -50,7 +50,7 @@ class AgilentController2:
         try:
             import visa #pylint: disable=F0401
             # try-clause
-            self.__agilent = visa.instrument('TCPIP0::169.254.58.10::gpib0,10::INSTR', timeout = 1)
+            self.__agilent = visa.instrument('TCPIP0::10.0.0.3::gpib0,9::INSTR', timeout = 1)
             logger.warn("Agilent 2 function generator loaded")
         except:
             logger.warn("can't load visa driver for Agilent function generator, using simulator")
@@ -59,7 +59,7 @@ class AgilentController2:
 
     def initialize(self):
         '''hardware initialization'''
-        pass
+        self.__agilent.write('OUTPUT ON')
 
     def startOutput(self,data):
         if not(data["PulseLength"] == 0):
@@ -68,14 +68,17 @@ class AgilentController2:
             self.__agilent.write('FUNC PULS')
             self.__agilent.write('PULS:PER 0.01')
             self.__agilent.write('PULS:WIDT ' + str(data["PulseLength"]) + 'ns')
-
-
-            print "I'm in burst mode"
+            self.__agilent.write('BURS:MODE TRIG')
+            self.__agilent.write('TRIG:SOUR EXT')
+            self.__agilent.write('BURS:NCYC 1')
+            self.__agilent.write('BURS:STAT ON')
+            self.__agilent.write('OUTPUT ON')
         else:
             self.__agilent.write('BURS:STAT OFF')
             self.__agilent.write('FUNC SIN')
             self.__agilent.write('FREQ ' + str(data["Freq"]))
             self.__agilent.write('VOLT ' + str(data["Amp"]))
+            self.__agilent.write('OUTPUT ON')
 
     def setFrequency(self, frequency):
         self.__agilent.write('FREQ ' + str(frequency))
