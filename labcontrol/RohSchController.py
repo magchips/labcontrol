@@ -55,33 +55,34 @@ class RohSchController:
             logger.warn("can't load visa driver for RohSch function generator, using simulator")
             self.__rohsch = RohSchSimulator()
 
-
     def initialize(self):
         '''hardware initialization'''
-        pass
+        self.__rohsch.write('*RST;*CLS')
+        self.__rohsch.write('OUTP:STAT ON')
+        localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+        file_name = "E:/code/labalyzer6_8/rsCalibrationCurve1.2mW.csv"
+        file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.2mW.csv")
+        self.__table = np.loadtxt(file_name, delimiter=',', skiprows=1)
+        self.setFrequency(300*10**6)
+        self.__rohsch.write('POW ' + str(-12.0) + 'dBm')
 
     def startOutput(self,data):
         freq = data["Freq"] #in Hz
         output = data["Output"]
         power = 0
         
-        self.__rohsch.write('*RST;*CLS')
-        self.__rohsch.write('OUTP:STAT ON')
-        self.__rohsch.write('AM:SOUR INT')
-        localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
-        file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.0mW.csv")
 
-        table = np.loadtxt(file_name, delimiter=',', skiprows=1)
+             
         count = 0
         point_found = False
         
-        for point in table:
+        for point in self.__table:
             point_freq = point[0] * 10**6
             if point_freq > freq and not point_found:
                 #linear interpolation
-                y1 = table[count - 1][1]
+                y1 = self.__table[count - 1][1]
                 y2 = point[1]
-                x1 = table[count - 1][0]
+                x1 = self.__table[count - 1][0]
                 x2 = point[0]
 
                 point_found = True

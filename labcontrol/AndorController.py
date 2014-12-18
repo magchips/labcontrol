@@ -47,6 +47,7 @@ class AndorSimulator:
 	def SetHSSpeed(self, speedType, index): pass
 	def SetVSSpeed(self, index): pass
 	def GetVSSpeed(self, index, speed): pass
+	def GetHSSpeed(self, a, b, c, d): pass
 	def SetShutter(self, typ, mode, closingtime, openingtime): pass
 	def SetTriggerMode(self, mode): pass
 	def GetDetector(self, xpixels, ypixels): pass

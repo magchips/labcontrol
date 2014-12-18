@@ -55,13 +55,13 @@ class ScopeController:
 		try:
 			import visa #pylint: disable=F0401
 			# try-clause
-			self.__scope = visa.instrument('TCPIP0::192.168.1.206::inst0::INSTR', timeout = 1) # used to be 192.168.1.221
+			self.__scope = visa.instrument('TCPIP0::192.168.1.206::inst0::INSTR', timeout = 1)
 		except ImportError:
 			logger.warn("can't load visa/Scope driver, using simulator")
 			self.__scope = ScopeSimulator()
-		except:
-			self.__scope = ScopeSimulator()
-			print "UNDIAGNOSED SCOPE PROBLEM"
+		#except:
+		#	self.__scope = ScopeSimulator()
+		#	print "UNDIAGNOSED SCOPE PROBLEM"
 
 
 	def initialize(self):

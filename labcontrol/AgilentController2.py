@@ -63,6 +63,7 @@ class AgilentController2:
 
     def startOutput(self,data):
         if not(data["PulseLength"] == 0):
+            self.__agilent.write('BURS:STAT ON')
             self.__agilent.write('VOLT:HIGH 5')
             self.__agilent.write('VOLT:LOW 0')
             self.__agilent.write('FUNC PULS')
@@ -71,14 +72,13 @@ class AgilentController2:
             self.__agilent.write('BURS:MODE TRIG')
             self.__agilent.write('TRIG:SOUR EXT')
             self.__agilent.write('BURS:NCYC 1')
-            self.__agilent.write('BURS:STAT ON')
-            self.__agilent.write('OUTPUT ON')
+                                   
         else:
             self.__agilent.write('BURS:STAT OFF')
             self.__agilent.write('FUNC SIN')
             self.__agilent.write('FREQ ' + str(data["Freq"]))
             self.__agilent.write('VOLT ' + str(data["Amp"]))
-            self.__agilent.write('OUTPUT ON')
+            
 
     def setFrequency(self, frequency):
         self.__agilent.write('FREQ ' + str(frequency))
