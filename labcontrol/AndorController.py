@@ -102,10 +102,12 @@ class AndorController:
 		'''initialize camera'''
 		self.__andor.Initialize("")
 		self.__andor.SetADChannel(1)
-		self.__andor.SetHSSpeed(0, 0)
+		self.__andor.SetHSSpeed(0, 0) #CHECK! first parameter might have to be 1
+		hspeed = ctypes.c_float(0)
+		self.__andor.GetHSSpeed(0, 0, 0, ctypes.byref(hspeed)) # first parameter is AD channel, same as in SetADChannel above
 		self.__andor.SetVSSpeed(1)
-		speed = ctypes.c_float(0)
-		self.__andor.GetVSSpeed(1, ctypes.byref(speed))
+		vspeed = ctypes.c_float(0)
+		self.__andor.GetVSSpeed(1, ctypes.byref(vspeed))
 		self.__andor.SetShutter(0, 1, 0, 0) # typ = 0: TTL Low to open; mode = 1: always open
 		self.__andor.SetTriggerMode(1) # 1 = External
 		xpx = ctypes.c_int(0)

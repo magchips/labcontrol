@@ -98,7 +98,7 @@ class AgilentController:
 
 	def setBurstMode(self):
 		self.setFrequency(1000)
-		self.__agilent.write('PULS:PER 0.01')
+		self.__agilent.write('PULS:PER 1.00')
 		self.__agilent.write('FUNC PULS')
 		self.__agilent.write('BURS:MODE TRIG')
 		self.__agilent.write('BURS:NCYC 1')
