@@ -55,10 +55,13 @@ class ScopeController:
 		try:
 			import visa #pylint: disable=F0401
 			# try-clause
-			self.__scope = visa.instrument('TCPIP0::10.0.0.2::inst0::INSTR', timeout = 1)
+			self.__scope = visa.instrument('TCPIP0::192.168.1.206::inst0::INSTR', timeout = 1)
 		except ImportError:
 			logger.warn("can't load visa/Scope driver, using simulator")
 			self.__scope = ScopeSimulator()
+		#except:
+		#	self.__scope = ScopeSimulator()
+		#	print "UNDIAGNOSED SCOPE PROBLEM"
 
 
 	def initialize(self):
@@ -90,7 +93,11 @@ class ScopeController:
 			data = self.__scope.read()
 			startIndex = 2 + int(data[1]) # there is a 'second header' of sorts, saying how long the data is; we don't need it.
 			yval = array('h')
-			yval.fromstring(data[startIndex:])
+			try:
+				yval.fromstring(data[startIndex:])
+			except ValueError:
+				print "ERROR converting scope data!"
+				return None, None
 		
 			xvalues = [x0 + xIncr*x for x in range(10000)]
 			yvalues = [(y - yOff)*yMult + y0 for y in yval]

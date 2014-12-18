@@ -47,6 +47,7 @@ class AndorSimulator:
 	def SetHSSpeed(self, speedType, index): pass
 	def SetVSSpeed(self, index): pass
 	def GetVSSpeed(self, index, speed): pass
+	def GetHSSpeed(self, a, b, c, d): pass
 	def SetShutter(self, typ, mode, closingtime, openingtime): pass
 	def SetTriggerMode(self, mode): pass
 	def GetDetector(self, xpixels, ypixels): pass
@@ -68,7 +69,6 @@ class AndorSimulator:
 	def SetNumberKinetics(self, number): pass
 	def SetExposureTime(self, exposureTime): pass
 	def StartAcquisition(self): pass
-	def GetNumberADChannels(self, channels): pass
 	def Shutdown(self): pass
 
 class AndorController:
@@ -77,7 +77,7 @@ class AndorController:
 		try:
 			self.__andor = ctypes.windll.atmcd32d
 			self.simulate = False
-		except AttributeError:
+		except:
 			logger.warn("can't load Andor driver, using simulator")
 			self.__andor = AndorSimulator()
 			self.simulate = True
@@ -103,10 +103,12 @@ class AndorController:
 		'''initialize camera'''
 		self.__andor.Initialize("")
 		self.__andor.SetADChannel(1)
-		self.__andor.SetHSSpeed(0, 0)
+		self.__andor.SetHSSpeed(0, 0) #CHECK! first parameter might have to be 1
+		hspeed = ctypes.c_float(0)
+		self.__andor.GetHSSpeed(0, 0, 0, ctypes.byref(hspeed)) # first parameter is AD channel, same as in SetADChannel above
 		self.__andor.SetVSSpeed(1)
-		speed = ctypes.c_float(0)
-		self.__andor.GetVSSpeed(1, ctypes.byref(speed))
+		vspeed = ctypes.c_float(0)
+		self.__andor.GetVSSpeed(1, ctypes.byref(vspeed))
 		self.__andor.SetShutter(0, 1, 0, 0) # typ = 0: TTL Low to open; mode = 1: always open
 		self.__andor.SetTriggerMode(1) # 1 = External
 		xpx = ctypes.c_int(0)
@@ -123,9 +125,9 @@ class AndorController:
 		'''start acquisition'''
 		logger.debug('starting camera acquisition')
 		self.__andor.SetReadMode(4)
-		self.__andor.SetImage(data["Binning"], data["Binning"], data["ROI X min"], data["ROI X max"], data["ROI Y min"], data["ROI Y max"])
-		self.size_x = data["ROI X max"] - data["ROI X min"] + 1
-		self.size_y = data["ROI Y max"] - data["ROI Y min"] + 1
+		self.__andor.SetImage(data["Binning"], data["Binning"], data["X min"], data["X max"], data["Y min"], data["Y max"])
+		self.size_x = data["X max"] - data["X min"] + 1
+		self.size_y = data["Y max"] - data["Y min"] + 1
 
 		self.__andor.SetAcquisitionMode(3)
 		self.__andor.SetNumberAccumulations(1)
@@ -154,7 +156,7 @@ class AndorController:
 				self.imageCounter += 1
 				self.cycleCount += 1
 				ind = self.cycleCount % 10 + 1
-				mul = 64000#*exp(-(ind-5)**2)
+				mul = 64000*exp(-(ind-5)**2)
 				return self.lightImage - self.baseImage*mul
 			if self.imageCounter == 1:
 				self.imageCounter += 1
@@ -176,12 +178,12 @@ class AndorController:
 				return 0
 			dt = time.time()-self.startTime
 			rt = 0
-			if dt > 4:
+			if dt > 7:
 				self.cycleComplete = True
 				rt = 3
-			elif dt > 3:
+			elif dt > 6:
 				rt = 2
-			elif dt > 2:
+			elif dt > 5:
 				rt = 1
 			return rt
 		################

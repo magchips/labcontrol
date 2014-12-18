@@ -115,7 +115,7 @@ class ViewpointController:
 		try:
 			self.__dio = ctypes.windll.dio64_32 # load the DLL
 			self.simulate = False
-		except AttributeError: # on error, use the simulator
+		except: # on error, use the simulator
 			logger.warn("can't load DIO driver, using simulator!")
 			self.__dio = ViewpointSimulator()
 			self.simulate = True

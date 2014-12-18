@@ -38,7 +38,6 @@ class PWS4721Controller:
 	def __init__(self):
 		try:
 			import visa #pylint: disable=F0401
-			# try-clause
 			self.__pws = visa.instrument('USB0::0x0699::0x0394::081003126669001010::INSTR', timeout = 1)
 		except ImportError:
 			logger.warn("can't load visa driver for PWS4721, using simulator")
