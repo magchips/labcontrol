@@ -84,7 +84,7 @@ class NIDAQOutputController:
 	def __init__(self):
 		try:
 			self.__nidaq = ctypes.windll.nicaiu # load the DLL
-		except AttributeError: # on error, use the simulator
+		except: # on error, use the simulator
 			logger.warn("can't load NIDAQ driver, using simulator")
 			self.__nidaq = NIDAQOutputSimulator()
 		self.taskIsConfigured = False
@@ -123,7 +123,7 @@ class NIDAQOutputController:
 	def CHK( self, err ):
 		"""a simple error checking routine"""
 		if err is None:
-			return
+			return 0
 		if err < 0:
 			buf_size = 200
 			buf = ctypes.create_string_buffer('\000' * buf_size)
@@ -134,6 +134,7 @@ class NIDAQOutputController:
 			buf = ctypes.create_string_buffer('\000' * buf_size)
 			self.__nidaq.DAQmxGetErrorString(err, ctypes.byref(buf), buf_size)
 			logger.error('nidaq generated warning %d: %s'%(err, repr(buf.value)))
+		return 1
 
 	def programmeChannels(self, aodata):
 		'''programme timeframe data to hardware'''
@@ -184,6 +185,9 @@ class NIDAQOutputController:
 		if mode == MODE_DIRECT:
 			# 0 buffer size
 			# not sure if this is the right thing to do
+			self.shutdown()
+			self.initialize()
+			
 			self.CHK(self.__nidaq.DAQmxCfgOutputBuffer(self.__taskHandle[0], ctypes.c_uint32(0)))
 			self.CHK(self.__nidaq.DAQmxCfgOutputBuffer(self.__taskHandle[1], ctypes.c_uint32(0)))
 
@@ -194,7 +198,7 @@ class NIDAQOutputController:
 						logger.error("there was a channel which did not belong to a known device! boardNumber was %d", v.boardNumber)
 					else:
 						self.CHK(self.__nidaq.DAQmxSetAODataXferMech(self.__taskHandle[v.boardNumber], v.GetDeviceString(), DAQmx_Val_ProgrammedIO))
-
+			print 'clock timing'
 			self.CHK(self.__nidaq.DAQmxCfgSampClkTiming( self.__taskHandle[0], "ao/SampleClockTimebase", float64(1), DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, uInt64(1)))
 			self.CHK(self.__nidaq.DAQmxCfgSampClkTiming( self.__taskHandle[1], "ao/SampleClockTimebase", float64(1), DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, uInt64(1)))  
 		else: # we presume all other cases are timeframe-output
@@ -218,7 +222,12 @@ class NIDAQOutputController:
 		'''force direct output'''
 		self.taskIsRunning = True
 		sampsWritten = ctypes.c_int32(0)
-		self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[0], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[0].ctypes.data, ctypes.byref(sampsWritten), None))
-		self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[1], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[1].ctypes.data, ctypes.byref(sampsWritten), None))
+		if (self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[0], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[0].ctypes.data, ctypes.byref(sampsWritten), None))) > 0:
+			print sampsWritten, 'samples written on dev1'
+			print aodata[0]
+		if (self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[1], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[1].ctypes.data, ctypes.byref(sampsWritten), None))) > 0:
+			print sampsWritten, 'samples written on dev2'
+			print aodata[1]
+			
 
 
