@@ -35,16 +35,16 @@ class AgilentController2:
     '''interface to Tektronix oscilloscopes'''
     def __init__(self,logID):
         if logID == 'labalyzer':
-            logger=logging.getLogger('labalyzer')
+            self.logger=logging.getLogger('labalyzer')
         elif logID == 'starkalyzer':
-            logger=logging.getLogger('starkalyzer')
+            self.logger=logging.getLogger('starkalyzer')
         try:
             import visa #pylint: disable=F0401
             # try-clause
             self.__agilent = visa.instrument('TCPIP0::10.0.0.3::gpib0,9::INSTR', timeout = 1)
-            logger.warn("Agilent 2 function generator loaded")
+            self.logger.warn("Agilent 2 function generator loaded")
         except:
-            logger.warn("can't load visa driver for Agilent function generator, using simulator")
+            self.logger.warn("can't load visa driver for Agilent function generator, using simulator")
             self.__agilent = AgilentSimulator()
 
 
@@ -92,7 +92,7 @@ class AgilentController2:
         self.__agilent.write('FUNC PULS') # set the function to pulse
         self.__agilent.write('PULS:PER 0.01')
         self.__agilent.write('PULS:WIDT ' + str(pulse_length) + 'ns' )
-        print "Agilent: Pulse period is set to " + str(pulse_length) + " s."
+        self.logger.debug("Agilent: Pulse period is set to " + str(pulse_length) + " s.")
         # add commands to set edge time, high lvl and low lvl voltage to get TTL
 
     def setBurstMode(self):
@@ -107,10 +107,10 @@ class AgilentController2:
     def updateBurstMode(self, mode):
         if mode == "Ext":
             self.__agilent.write('TRIG:SOUR EXT')
-            print "Agilent: Trigger is set to external."
+            self.logger.debug("Agilent: Trigger is set to external.")
         else:
             self.__agilent.write('TRIG:SOUR BUS')
-            print "Agilent: Trigger is set to BUS. Trig button should be gloing."
+            self.logger.debug("Agilent: Trigger is set to BUS. Trig button should be gloing.")
 
 
     def toggleOutput(self, outputOn):

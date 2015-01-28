@@ -96,7 +96,7 @@ class ScopeController:
 			try:
 				yval.fromstring(data[startIndex:])
 			except ValueError:
-				print "ERROR converting scope data!"
+				logger.warn("ERROR converting scope data!")
 				return None, None
 		
 			xvalues = [x0 + xIncr*x for x in range(10000)]

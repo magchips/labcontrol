@@ -119,7 +119,6 @@ class NIDAQInputController:
 		self.CHK(self.__nidaq.DAQmxSetStartTrigType(self.__taskHandle, int32(10150)))
 		self.CHK(self.__nidaq.DAQmxCfgDigEdgeRefTrig(self.__taskHandle, "/dev3/PFI0", int32(10280), uInt32(noSamples/2)))
 		
-		# print 'checking task -- result: ', self.__nidaq.DAQmxTaskControl(self.taskHandle, 2) # check task
 		self.noChannels = len(channels)
 		self.noSamples = noSamples
 		
@@ -151,7 +150,7 @@ class NIDAQInputController:
 
 		self.__nidaq.DAQmxReadAnalogF64(self.__taskHandle, int32(self.noSamples), float64(200), DAQmx_Val_GroupByChannel, ctypes.byref(buff), uInt32(tmp), ctypes.byref(sRead), None)
 		
-		print sRead.value, "samples read"
+		logger.debug(str(sRead.value) + " samples read")
 		return buff	
 	
 	def startTask(self):

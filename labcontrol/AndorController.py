@@ -53,7 +53,7 @@ class AndorSimulator:
 	def GetDetector(self, xpixels, ypixels): pass
 	def SetPreAmpGain(self, index): pass
 	def GetPreAmpGain(self, index, gain): pass
-	def SetTemperature(self, temperature): pass
+	def SetTemperatureF(self, temperature): pass
 	def CoolerON(self): pass
 	def CoolerOFF(self): pass
 	def GetTemperature(self, temperature): pass
@@ -106,11 +106,11 @@ class AndorController:
 		self.__andor.SetHSSpeed(0, 0) #CHECK! first parameter might have to be 1
 		hspeed = ctypes.c_float(0)
 		self.__andor.GetHSSpeed(0, 0, 0, ctypes.byref(hspeed)) # first parameter is AD channel, same as in SetADChannel above
-		print "HSSpeed is now", hspeed
+		logger.debug("HSSpeed is now " + str(hspeed))
 		self.__andor.SetVSSpeed(1)
 		vspeed = ctypes.c_float(0)
 		self.__andor.GetVSSpeed(1, ctypes.byref(vspeed))
-		print "VSSpeed is", vspeed
+		logger.debug("VSSpeed is " + str(vspeed))
 		self.__andor.SetShutter(0, 1, 0, 0) # typ = 0: TTL Low to open; mode = 1: always open
 		self.__andor.SetTriggerMode(1) # 1 = External
 		xpx = ctypes.c_int(0)
@@ -119,7 +119,7 @@ class AndorController:
 		self.__andor.SetPreAmpGain(2) # 2 is the index of the gain we want. stupid...
 		gain = ctypes.c_float(0)
 		self.__andor.GetPreAmpGain(2, ctypes.byref(gain)) # now we get an actual number out
-		print "gain is", gain
+		logger.debug("gain is " + str(gain))
 		self.__andor.SetTemperature(settings['andor.temp'])
 		self.__andor.CoolerON()
 		logger.info("Andor Controller Initialized")
@@ -174,7 +174,7 @@ class AndorController:
 	
 	def getTemperature(self):
 		temp = ctypes.c_float(0)
-		self.__andor.GetTemperature(ctypes.byref(temp))
+		self.__andor.GetTemperatureF(ctypes.byref(temp))
 		return temp.value
 
 	def getNumberAvailableImages(self):
@@ -202,5 +202,4 @@ class AndorController:
 		first = ctypes.c_long(0)
 		last = ctypes.c_long(0)
 		self.__andor.GetNumberNewImages(ctypes.byref(first), ctypes.byref(last))
-		print first, last
 		return last.value - first.value + 1

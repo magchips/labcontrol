@@ -199,7 +199,6 @@ class NIDAQOutputController:
 						logger.error("there was a channel which did not belong to a known device! boardNumber was %d", v.boardNumber)
 					else:
 						self.CHK(self.__nidaq.DAQmxSetAODataXferMech(self.__taskHandle[v.boardNumber], v.GetDeviceString(), DAQmx_Val_ProgrammedIO))
-			print 'clock timing'
 			self.CHK(self.__nidaq.DAQmxCfgSampClkTiming( self.__taskHandle[0], "ao/SampleClockTimebase", float64(1), DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, uInt64(1)))
 			self.CHK(self.__nidaq.DAQmxCfgSampClkTiming( self.__taskHandle[1], "ao/SampleClockTimebase", float64(1), DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, uInt64(1)))  
 		else: # we presume all other cases are timeframe-output
@@ -224,11 +223,13 @@ class NIDAQOutputController:
 		self.taskIsRunning = True
 		sampsWritten = ctypes.c_int32(0)
 		if (self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[0], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[0].ctypes.data, ctypes.byref(sampsWritten), None))) > 0:
-			print sampsWritten, 'samples written on dev1'
-			print aodata[0]
+			#print sampsWritten, 'samples written on dev1'
+			#print aodata[0]
+                        pass
 		if (self.CHK(self.__nidaq.DAQmxWriteAnalogF64(self.__taskHandle[1], int32(1), 1, float64(-1), DAQmx_Val_GroupByScanNumber, aodata[1].ctypes.data, ctypes.byref(sampsWritten), None))) > 0:
-			print sampsWritten, 'samples written on dev2'
-			print aodata[1]
+			#print sampsWritten, 'samples written on dev2'
+			#print aodata[1]
+                        pass
 			
 
 
