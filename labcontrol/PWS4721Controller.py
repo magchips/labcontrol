@@ -18,7 +18,7 @@
 
 
 import logging
-logger = logging.getLogger('starkalyzer')
+logger = logging.getLogger('labalyzer')
 
 class PWS4721Simulator:
 	'''simulator, if visa is not present'''
@@ -43,10 +43,14 @@ class PWS4721Controller:
 			logger.warn("can't load visa driver for PWS4721, using simulator")
 			self.__pws = PWS4721Simulator()
 
+	def startOutput(self,data):
+		voltage=data["Voltage"]
+		self.setVoltage(voltage)
+		logger.debug('Voltage generator set to ' + str(data['Voltage']) + ' Volts')   
 
 	def initialize(self):
 		'''hardware initialization'''
-		pass
+		self.__pws.write('VOLTAGE ' + str(0))
 		
 	
 	def setVoltage(self, voltage):

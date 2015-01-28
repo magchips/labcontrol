@@ -60,7 +60,6 @@ class RohSchController:
         self.__rohsch.write('*RST;*CLS')
         self.__rohsch.write('OUTP:STAT ON')
         localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
-        file_name = "E:/code/labalyzer6_8/rsCalibrationCurve1.2mW.csv"
         file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.2mW.csv")
         self.__table = np.loadtxt(file_name, delimiter=',', skiprows=1)
         self.setFrequency(300*10**6)

@@ -27,15 +27,6 @@ class AgilentSimulator:
 
     def read(self):
         return None
-
-    def startOutput(self, data):
-        if data["PulseLength"] is not 0:
-            print "Timeframe settings are initialized, pulse period isn zero."
-            print "Pulse period is set to " + str(data["PulseLength"])
-        else:
-            print "Timeframe settings are initialized, pulse period was zero."
-            print "Frequency is set to " + str(data["Freq"]) + ". Amplitude was set to " + str(data["Amp"])
-
     def write(self, string):
         '''visa command write function'''
         self.lastCommand = string
@@ -71,8 +62,7 @@ class AgilentController2:
             self.__agilent.write('PULS:WIDT ' + str(data["PulseLength"]) + 'ns')
             self.__agilent.write('BURS:MODE TRIG')
             self.__agilent.write('TRIG:SOUR EXT')
-            self.__agilent.write('BURS:NCYC 1')
-                                   
+            self.__agilent.write('BURS:NCYC 1')                          
         else:
             self.__agilent.write('BURS:STAT OFF')
             self.__agilent.write('FUNC SIN')
