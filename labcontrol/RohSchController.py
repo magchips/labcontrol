@@ -42,17 +42,17 @@ class RohSchController:
     '''interface to Rhode&Schwarz microwave source'''
     def __init__(self,logID):
         if logID == 'labalyzer':
-            logger=logging.getLogger('labalyzer')
+            self.logger=logging.getLogger('labalyzer')
         elif logID == 'starkalyzer':
-            logger=logging.getLogger('starkalyzer')
+            self.logger=logging.getLogger('starkalyzer')
         try:
             import visa #pylint: disable=F0401
             # try-clause
             
             self.__rohsch = visa.instrument('TCPIP0::10.0.0.3::gpib0,28::INSTR', timeout = 1)
-            logger.warn("RohSch function generator loaded")
+            self.logger.warn("RohSch function generator loaded")
         except:
-            logger.warn("can't load visa driver for RohSch function generator, using simulator")
+            self.logger.warn("can't load visa driver for RohSch function generator, using simulator")
             self.__rohsch = RohSchSimulator()
 
     def initialize(self):
@@ -67,35 +67,41 @@ class RohSchController:
 
     def startOutput(self,data):
         freq = data["Freq"] #in Hz
-        output = data["Output"]
+        output = data["Power"] # in dBm
+        mode = data["Mode"] # whether or not to use automatic power adaption
+        
         power = 0
         
 
-             
-        count = 0
-        point_found = False
-        
-        for point in self.__table:
-            point_freq = point[0] * 10**6
-            if point_freq > freq and not point_found:
-                #linear interpolation
-                y1 = self.__table[count - 1][1]
-                y2 = point[1]
-                x1 = self.__table[count - 1][0]
-                x2 = point[0]
+        if mode is True:
+            self.logger.debug("Automatic output power mode activated for R&S")
+            count = 0
+            point_found = False
+            
+            for point in self.__table:
+                point_freq = point[0] * 10**6
+                if point_freq > freq and not point_found:
+                    #linear interpolation
+                    y1 = self.__table[count - 1][1]
+                    y2 = point[1]
+                    x1 = self.__table[count - 1][0]
+                    x2 = point[0]
 
-                point_found = True
+                    point_found = True
 
-                power = y1 + ((y2-y1)/(x2-x1)) * (freq * 10**(-6) - x1)
-                
-            elif point_freq == freq:
-                power = point[1]
-                point_found = True
-                
-            count += 1
+                    power = y1 + ((y2-y1)/(x2-x1)) * (freq * 10**(-6) - x1)
+                    
+                elif point_freq == freq:
+                    power = point[1]
+                    point_found = True
+                    
+                count += 1
+        else:
+            power=output
 
         self.setFrequency(freq)
         self.setPower(power)
+        self.logger.debug("R&S frequency set to " +str(freq) +" and output power set to " + str(power) +" dBm")
 
     def setFrequency(self, frequency):
         self.__rohsch.write('FREQ ' + str(frequency))

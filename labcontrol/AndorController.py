@@ -53,7 +53,7 @@ class AndorSimulator:
 	def GetDetector(self, xpixels, ypixels): pass
 	def SetPreAmpGain(self, index): pass
 	def GetPreAmpGain(self, index, gain): pass
-	def SetTemperatureF(self, temperature): pass
+	def SetTemperature(self, temperature): pass
 	def CoolerON(self): pass
 	def CoolerOFF(self): pass
 	def GetTemperature(self, temperature): pass
@@ -174,7 +174,7 @@ class AndorController:
 	
 	def getTemperature(self):
 		temp = ctypes.c_float(0)
-		self.__andor.GetTemperatureF(ctypes.byref(temp))
+		self.__andor.GetTemperature(ctypes.byref(temp))
 		return temp.value
 
 	def getNumberAvailableImages(self):
