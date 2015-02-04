@@ -62,8 +62,15 @@ class RohSchController:
         localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
         file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.2mW.csv")
         self.__table = np.loadtxt(file_name, delimiter=',', skiprows=1)
+        self.__startFreq=300*10**6
         self.setFrequency(300*10**6)
         self.__rohsch.write('POW ' + str(-12.0) + 'dBm')
+        self.__rohsch.write('SOUR:FREQ:MODE SWE')
+        self.__rohsch.write('SOUR:SWE:MODE AUTO')
+        self.__rohsch.write('TRIG:SOUR SING')
+        self.__rohsch.write('SOUR:SWE:STEP:LIN 100kHz')
+        self.__rohsch.write('SOUR:SWE:DWEL 10ms')
+        
 
     def startOutput(self,data):
         freq = data["Freq"] #in Hz
@@ -99,12 +106,19 @@ class RohSchController:
         else:
             power=output
 
-        self.setFrequency(freq)
-        self.setPower(power)
         self.logger.debug("R&S frequency set to " +str(freq) +" and output power set to " + str(power) +" dBm")
+        self.setPower(power)
+        self.setFrequency(freq)
+        
+        
 
     def setFrequency(self, frequency):
-        self.__rohsch.write('FREQ ' + str(frequency))
+##        self.__rohsch.write('FREQ ' + str(frequency))
+        self.__rohsch.write('SOUR:FREQ:STOP ' + str(frequency))
+        self.__startFreq=frequency
+        self.logger.debug("R&S sweep start frequency set to " + str(self.__startFreq))
+        self.__rohsch.write('TRIG')
+        
 
     def setPower(self, power):
         self.__rohsch.write('POW ' + str(power) + 'dBm')
