@@ -66,7 +66,8 @@ class RohSchController:
         self.__rohsch.write('SOUR:FREQ:MODE SWE')
         self.__rohsch.write('SOUR:SWE:MODE AUTO')
         self.__rohsch.write('TRIG:SOUR SING')
-        self.__rohsch.write('SOUR:SWE:STEP:LIN 100kHz')
+        #the maximum step is limited by the time t=step/stepsize*dwell time
+        self.__rohsch.write('SOUR:SWE:STEP:LIN 50kHz')
         self.__rohsch.write('SOUR:SWE:DWEL 10ms')
         self.__startFreq=300*10**6
         self.setFrequency(self.__startFreq)
