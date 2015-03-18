@@ -57,11 +57,11 @@ class RohSchController:
 
     def initialize(self):
         '''hardware initialization'''
-        self.__rohsch.write('*RST;*CLS')
-        self.__rohsch.write('OUTP:STAT ON')
         localfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
         file_name = os.path.join(localfolder, "ressources/rsCalibrationCurve1.2mW.csv")
         self.__table = np.loadtxt(file_name, delimiter=',', skiprows=1)
+        self.__rohsch.write('*RST;*CLS')
+        self.__rohsch.write('OUTP:STAT ON')
         self.__rohsch.write('POW ' + str(-12.0) + 'dBm')
         self.__rohsch.write('SOUR:FREQ:MODE SWE')
         self.__rohsch.write('SOUR:SWE:MODE AUTO')
