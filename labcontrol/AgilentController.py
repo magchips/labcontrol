@@ -63,7 +63,8 @@ class AgilentController:
 			self.__agilent.write('VOLT:LOW 0')
 			self.__agilent.write('FUNC PULS')
 			self.__agilent.write('PULS:PER 1.00')
-			self.__agilent.write('PULS:WIDT ' + str(data["PulseLength"]) + 'ns')
+			self.__agilent.write('PULS:WIDT ' 
+			+ str(data["PulseLength"]) + 'ns')
 			self.__agilent.write('BURS:MODE TRIG')
 			self.__agilent.write('TRIG:SOUR EXT')
 			self.__agilent.write('BURS:NCYC 1')
