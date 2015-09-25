@@ -41,10 +41,14 @@ class AgilentController:
 		try:
 			import visa #pylint: disable=F0401
 			# try-clause
-			self.__agilent = visa.instrument('TCPIP0::10.0.0.3::gpib0,10::INSTR', timeout = 1)
+			self.__agilent = visa.instrument(
+				'TCPIP0::10.0.0.3::gpib0,10::INSTR',
+				timeout = 1)
 			self.logger.warn("Agilent function generator loaded")
 		except:
-			self.logger.warn("can't load visa driver for Agilent function generator, using simulator")
+			self.logger.warn(
+				"can't load visa driver for Agilent" 
+				"function generator, using simulator")
 			self.__agilent = AgilentSimulator()
 
 
