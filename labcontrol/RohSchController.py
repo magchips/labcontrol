@@ -107,7 +107,8 @@ class RohSchController:
         else:
             power=output
 
-        self.logger.debug("R&S will be ramped from "+str(self.__startFreq)+"Hz to " +str(freq) +"Hz and output power set to " + str(power) +" dBm")
+        self.logger.debug("R&S will be ramped from "+str(self.__startFreq)+"Hz"
+        " to " +str(freq) +"Hz and output power set to " + str(power) +" dBm")
         self.setPower(power)
         self.setFrequency(freq)
         
