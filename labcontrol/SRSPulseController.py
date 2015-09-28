@@ -64,34 +64,59 @@ class SRSPulseController:
         if srsPulseSettings["PulseLength"] == 0:
             if RD < 0:
                 self.__pulse.write("DT 5,1,0")
-                self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
-                self.__pulse.write("DT 2,1," + str(RD * -1.0) + "E-9")
-                self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
+                self.__pulse.write("DT 6,5,"
+                + str(srsPulseSettings["CDPulseLength"]) 
+                + "E-9")
+                self.__pulse.write("DT 2,1," 
+                + str(RD * -1.0) + "E-9")
+                self.__pulse.write("DT 3,2," 
+                + str(srsPulseSettings["ABPulseLength"]) 
+                + "E-9")
 
             elif RD == 0:
                 self.__pulse.write("DT 5,1,0")
-                self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
-                self.__pulse.write("DT 2,1," + str(RD) + "E-9")
-                self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
+                self.__pulse.write("DT 6,5," 
+                + str(srsPulseSettings["CDPulseLength"]) 
+                + "E-9")
+                self.__pulse.write("DT 2,1," 
+                + str(RD) + "E-9")
+                self.__pulse.write("DT 3,2," 
+                + str(srsPulseSettings["ABPulseLength"]) 
+                + "E-9")
 
             elif RD > 0:
                 self.__pulse.write("DT 2,1,0")
-                self.__pulse.write("DT 3,2," + str(srsPulseSettings["ABPulseLength"]) + "E-9")
-                self.__pulse.write("DT 5,1," + str(RD) + "E-9")
-                self.__pulse.write("DT 6,5," + str(srsPulseSettings["CDPulseLength"]) + "E-9")
+                self.__pulse.write("DT 3,2," 
+                + str(srsPulseSettings["ABPulseLength"]) 
+                + "E-9")
+                self.__pulse.write("DT 5,1," 
+                + str(RD) 
+                + "E-9")
+                self.__pulse.write("DT 6,5," 
+                + str(srsPulseSettings["CDPulseLength"]) 
+                + "E-9")
 
         else:
             if srsPulseSettings["RelativeDelay"] <= 0:
                 self.__pulse.write("DT 5,1,0")
-                self.__pulse.write("DT 6,5," + str(srsPulseSettings["PulseLength"]) + "E-9")
-                self.__pulse.write("DT 2,1," + str(srsPulseSettings["RelativeDelay"] * -1.0 + constants.DELAY_REDBLUE) + "E-9")
-                self.__pulse.write("DT 3,2," + str(srsPulseSettings["PulseLength"]) + "E-9")
+                self.__pulse.write("DT 6,5," 
+                + str(srsPulseSettings["PulseLength"]) 
+                + "E-9")
+                self.__pulse.write("DT 2,1," 
+                + str(srsPulseSettings["RelativeDelay"] * -1.0 
+                + constants.DELAY_REDBLUE) + "E-9")
+                self.__pulse.write("DT 3,2," 
+                + str(srsPulseSettings["PulseLength"]) + "E-9")
 
             elif srsPulseSettings["RelativeDelay"] > 0:
                 self.__pulse.write("DT 2,1,0")
-                self.__pulse.write("DT 3,2," + str(srsPulseSettings["PulseLength"]) + "E-9")
-                self.__pulse.write("DT 5,1," + str(srsPulseSettings["RelativeDelay"] + constants.DELAY_REDBLUE) + "E-9")
-                self.__pulse.write("DT 6,5," + str(srsPulseSettings["PulseLength"]) + "E-9")
+                self.__pulse.write("DT 3,2," 
+                + str(srsPulseSettings["PulseLength"]) + "E-9")
+                self.__pulse.write("DT 5,1," 
+                + str(srsPulseSettings["RelativeDelay"] 
+                + constants.DELAY_REDBLUE) + "E-9")
+                self.__pulse.write("DT 6,5," 
+                + str(srsPulseSettings["PulseLength"]) + "E-9")
 
 
 
