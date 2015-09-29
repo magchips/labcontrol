@@ -94,13 +94,17 @@ class NIDAQOutputController:
     def initialize(self):
         '''initilaize hardware'''
         if self.taskIsConfigured:
-            logger.error('tried to re-initialize nidaq controller while task was not cleared, call shutdown first')
+            logger.error("tried to re-initialize nidaq controller"
+            "while task was not cleared, call shutdown first")
             return
         
         self.__taskHandle = [TaskHandle(0), TaskHandle(0), TaskHandle(0)]
-        self.CHK(self.__nidaq.DAQmxCreateTask("", ctypes.byref(self.__taskHandle[0])))
-        self.CHK(self.__nidaq.DAQmxCreateTask("", ctypes.byref(self.__taskHandle[1])))
-        self.CHK(self.__nidaq.DAQmxCreateTask("", ctypes.byref(self.__taskHandle[2])))
+        self.CHK(self.__nidaq.DAQmxCreateTask("",
+        ctypes.byref(self.__taskHandle[0])))
+        self.CHK(self.__nidaq.DAQmxCreateTask("",
+        ctypes.byref(self.__taskHandle[1])))
+        self.CHK(self.__nidaq.DAQmxCreateTask("",
+        ctypes.byref(self.__taskHandle[2])))
         
         # apparently these have to be sorted in the order of the data array below
         # limits still need ot be set properly?!
