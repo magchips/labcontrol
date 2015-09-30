@@ -117,9 +117,14 @@ class NIDAQOutputController:
             for entry in devByChannel[channel]:
                 v = settings['AnalogChannels'][entry]
                 if v.boardNumber not in [0, 1, 2]:
-                    logger.error("there was a channel which did not belong to a known device! boardNumber was %d", v.boardNumber)
+                    logger.error("there was a channel which did not"
+                    " belong to a known device! boardNumber was %d",
+                    v.boardNumber)
                 else:
-                    self.CHK(self.__nidaq.DAQmxCreateAOVoltageChan( self.__taskHandle[v.boardNumber], v.GetDeviceString(), "", float64(-10), float64(10), DAQmx_Val_Volts, None))
+                    self.CHK(self.__nidaq.DAQmxCreateAOVoltageChan( 
+                        self.__taskHandle[v.boardNumber], v.GetDeviceString(), 
+                        "", float64(-10), float64(10), DAQmx_Val_Volts, None)
+                        )
         
         self.taskIsConfigured = True
         
